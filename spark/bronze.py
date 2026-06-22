@@ -22,7 +22,9 @@ rp_username = os.getenv('REDPANDA_USERNAME')
 rp_password = os.getenv('REDPANDA_PASSWORD')
 rp_topic = os.getenv('REDPANDA_TOPIC')
 rp_bootstrap = os.getenv('REDPANDA_BOOTSTRAP')
-
+aws_access_key = os.getenv('AWS_ACCESS_KEY_ID')
+aws_secret_key = os.getenv('AWS_SECRET_ACCESS_KEY')
+aws_region = os.getenv('AWS_REGION')
 spark = SparkSession.builder.appName("BronzeLayer").getOrCreate()
 
 raw_df = spark.readStream \
