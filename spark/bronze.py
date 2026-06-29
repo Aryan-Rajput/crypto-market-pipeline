@@ -50,3 +50,16 @@ flattened_df = parsed_df.select(
     F.col("data.T").alias("trade_time"),
     F.col("data.m").alias("is_market_maker")
 )
+flat_df = flattened_df.withColumn(
+    "event_date", 
+    F.to_date((F.col("event_time") / 1000).cast("timestamp"))
+)
+
+flat_df.writeStream \
+    .format("delta") \
+    .option("path", f"s3a://crypto-pipeline-ar/bronze-ticks/") \
+    .option("checkpointLocation", f"s3a://crypto-pipeline-ar/bronze-ticks/_checkpoints/") \
+    .partitionBy("event_date") \
+    .outputMode("append") \
+    .start() \
+    .awaitTermination()
