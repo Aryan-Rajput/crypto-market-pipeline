@@ -24,7 +24,7 @@ def on_message(ws, message):
     dict_message = json.loads(message)
     print(f"Received message: {dict_message}")
     producer.send(rp_topic, value=dict_message)
-    producer.flush()  # Ensure the message is sent immediately
+    producer.flush() 
 
 ws_app = websocket.WebSocketApp(
     "wss://stream.binance.com:9443/ws/btcusdt@trade/ethusdt@trade",
