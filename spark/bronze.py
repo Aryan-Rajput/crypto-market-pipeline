@@ -2,7 +2,7 @@ from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
 from dotenv import load_dotenv
 import os
-from pyspark.sql.types import StructType, StructField, StringType, LongType, DoubleType, BooleanType
+from pyspark.sql.types import StructType, StructField, StringType, LongType, BooleanType
 
 load_dotenv()
 
@@ -25,7 +25,16 @@ rp_bootstrap = os.getenv('REDPANDA_BOOTSTRAP')
 aws_access_key = os.getenv('AWS_ACCESS_KEY_ID')
 aws_secret_key = os.getenv('AWS_SECRET_ACCESS_KEY')
 aws_region = os.getenv('AWS_REGION')
-spark = SparkSession.builder.appName("BronzeLayer").getOrCreate()
+
+spark = SparkSession.builder \
+    .appName("BronzeLayer") \
+    .config("spark.hadoop.fs.s3a.access.key", aws_access_key) \
+    .config("spark.hadoop.fs.s3a.secret.key", aws_secret_key) \
+    .config("spark.hadoop.fs.s3a.endpoint", f"s3.{aws_region}.amazonaws.com") \
+    .config("spark.hadoop.fs.s3a.aws.credentials.provider", "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider") \
+    .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension") \
+    .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog") \
+    .getOrCreate()
 
 raw_df = spark.readStream \
     .format("kafka") \
@@ -57,8 +66,8 @@ flat_df = flattened_df.withColumn(
 
 flat_df.writeStream \
     .format("delta") \
-    .option("path", f"s3a://crypto-pipeline-ar/bronze-ticks/") \
-    .option("checkpointLocation", f"s3a://crypto-pipeline-ar/bronze-ticks/_checkpoints/") \
+    .option("path", "s3a://crypto-pipeline-ar/bronze-ticks/") \
+    .option("checkpointLocation", "s3a://crypto-pipeline-ar/bronze-ticks/_checkpoints/") \
     .partitionBy("event_date") \
     .outputMode("append") \
     .start() \
