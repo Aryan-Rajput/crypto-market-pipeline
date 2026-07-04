@@ -34,6 +34,7 @@ spark = SparkSession.builder \
     .config("spark.hadoop.fs.s3a.aws.credentials.provider", "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider") \
     .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension") \
     .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog") \
+    .config("spark.sql.caseSensitive", "true") \
     .getOrCreate()
 
 raw_df = spark.readStream \
@@ -59,8 +60,19 @@ flattened_df = parsed_df.select(
     F.col("data.T").alias("trade_time"),
     F.col("data.m").alias("is_market_maker")
 )
+
+flattened_df = flattened_df \
+    .withColumnRenamed("e", "event_type") \
+    .withColumnRenamed("E", "event_time") \
+    .withColumnRenamed("s", "symbol") \
+    .withColumnRenamed("t", "trade_id") \
+    .withColumnRenamed("p", "price") \
+    .withColumnRenamed("q", "quantity") \
+    .withColumnRenamed("T", "trade_time") \
+    .withColumnRenamed("m", "is_market_maker")
+
 flat_df = flattened_df.withColumn(
-    "event_date", 
+    "event_date",
     F.to_date((F.col("event_time") / 1000).cast("timestamp"))
 )
 
