@@ -43,7 +43,7 @@ raw_df = spark.readStream \
     .option("subscribe", rp_topic) \
     .option("kafka.security.protocol", "SASL_SSL") \
     .option("kafka.sasl.mechanism", "SCRAM-SHA-256") \
-    .option("kafka.sasl.jaas", f"org.apache.kafka.common.security.scram.ScramLoginModule required username='{rp_username}' password='{rp_password}';") \
+    .option("kafka.sasl.jaas.config", f'org.apache.kafka.common.security.scram.ScramLoginModule required username="{rp_username}" password="{rp_password}";') \
     .load()
 
 parsed_df = raw_df \

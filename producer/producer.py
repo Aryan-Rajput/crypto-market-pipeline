@@ -1,4 +1,5 @@
 import json
+from time import time
 from dotenv import load_dotenv
 import os
 from kafka import KafkaProducer
@@ -26,8 +27,13 @@ def on_message(ws, message):
     producer.send(rp_topic, value=dict_message)
     producer.flush() 
 
-ws_app = websocket.WebSocketApp(
-    "wss://stream.binance.com:9443/ws/btcusdt@trade/ethusdt@trade",
-    on_message=on_message
-)
-ws_app.run_forever()
+while True:
+    try:
+        ws_app = websocket.WebSocketApp(
+            "wss://stream.binance.com:9443/ws/btcusdt@trade/ethusdt@trade",
+            on_message=on_message
+        )
+        ws_app.run_forever(ping_interval=30, ping_timeout=10)
+    except Exception as e:
+        print(f"Connection dropped: {e}, reconnecting...")
+        time.sleep(5)
