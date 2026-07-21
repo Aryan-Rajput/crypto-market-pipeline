@@ -23,7 +23,7 @@ spark = SparkSession.builder \
 
 silver_df = spark.readStream \
     .format("delta") \
-    .load("s3a://crypto-pipeline-ar/bronze/") \
+    .load("s3a://crypto-pipeline-ar/bronze-ticks/") \
     .withColumn("event_time", F.from_unixtime(F.col("event_time") / 1000).cast("timestamp")) \
     .withColumn("trade_time", F.from_unixtime(F.col("trade_time") / 1000).cast("timestamp")) \
     .withColumn("price", F.col("price").cast("double")) \
@@ -53,6 +53,11 @@ vwap_df = silver_df \
         "trade_count"
     )
 
-# Separate VWAP results for BTCUSDT and ETHUSDT
-vwap_btc_df = vwap_df.filter(F.col("symbol") == "BTCUSDT")
-vwap_eth_df = vwap_df.filter(F.col("symbol") == "ETHUSDT")
+silver_query = vwap_df.writeStream \
+    .format("delta") \
+    .outputMode("append") \
+    .option("checkpointLocation", "s3a://crypto-pipeline-ar/silver-features/_checkpoints/") \
+    .option("path", "s3a://crypto-pipeline-ar/silver-features/") \
+    .start()
+
+silver_query.awaitTermination()
