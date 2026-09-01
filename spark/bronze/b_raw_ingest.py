@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 import os
 from pyspark.sql.types import StructType, StructField, StringType, LongType, BooleanType
 
+from spark.utils.spark_session import get_spark_session
+
 load_dotenv()
 
 schema = StructType([
@@ -26,16 +28,8 @@ aws_access_key = os.getenv('AWS_ACCESS_KEY_ID')
 aws_secret_key = os.getenv('AWS_SECRET_ACCESS_KEY')
 aws_region = os.getenv('AWS_REGION')
 
-spark = SparkSession.builder \
-    .appName("BronzeLayer") \
-    .config("spark.hadoop.fs.s3a.access.key", aws_access_key) \
-    .config("spark.hadoop.fs.s3a.secret.key", aws_secret_key) \
-    .config("spark.hadoop.fs.s3a.endpoint", f"s3.{aws_region}.amazonaws.com") \
-    .config("spark.hadoop.fs.s3a.aws.credentials.provider", "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider") \
-    .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension") \
-    .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog") \
-    .config("spark.sql.caseSensitive", "true") \
-    .getOrCreate()
+
+spark = get_spark_session("BronzeLayer")
 
 raw_df = spark.readStream \
     .format("kafka") \

@@ -4,22 +4,16 @@ from dotenv import load_dotenv
 import os
 from pyspark.sql.types import StructType, StructField, StringType, LongType, BooleanType
 
+from spark.utils.spark_session import get_spark_session
+
 load_dotenv()
 
 aws_access_key = os.getenv('AWS_ACCESS_KEY_ID')
 aws_secret_key = os.getenv('AWS_SECRET_ACCESS_KEY')
 aws_region = os.getenv('AWS_REGION')
 
-spark = SparkSession.builder \
-    .appName("SilverLayer") \
-    .config("spark.hadoop.fs.s3a.access.key", aws_access_key) \
-    .config("spark.hadoop.fs.s3a.secret.key", aws_secret_key) \
-    .config("spark.hadoop.fs.s3a.endpoint", f"s3.{aws_region}.amazonaws.com") \
-    .config("spark.hadoop.fs.s3a.aws.credentials.provider", "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider") \
-    .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension") \
-    .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog") \
-    .config("spark.sql.caseSensitive", "true") \
-    .getOrCreate()
+
+spark = get_spark_session("SilverLayer")
 
 silver_df = spark.readStream \
     .format("delta") \
@@ -50,7 +44,11 @@ vwap_df = silver_df \
         "symbol",
         "vwap",
         "total_quantity",
-        "trade_count"
+        "trade_count",
+        "first_price",
+        "last_price",
+        "min_price",
+        "max_price"
     )
 
 silver_query = vwap_df.writeStream \
