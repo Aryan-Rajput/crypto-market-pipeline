@@ -1,3 +1,4 @@
 .env
 venv
 crypto-pipeline-key.pem
+docs
