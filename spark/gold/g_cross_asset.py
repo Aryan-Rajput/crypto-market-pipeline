@@ -1,5 +1,6 @@
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
+from detla.tables import DeltaTable
 import os
 
 from spark.utils.spark_session import get_spark_session
@@ -34,3 +35,19 @@ output_df = btc_df.join(eth_df, on="window_start", how="inner") \
         "eth_ofi_norm",
         (F.col("btc_ofi_norm") - F.col("eth_ofi_norm")).alias("divergence")
     )
+
+
+gold_path = "s3a://crypto-pipeline-ar/gold/cross-asset-signal/"
+
+if DeltaTable.isDeltaTable(spark, gold_path):
+    gold_table = DeltaTable.forPath(spark, gold_path)
+    gold_table.alias("target").merge(
+        output_df.alias("source"),
+        "target.window_start = source.window_start"
+    ).whenMatchedUpdateAll() \
+     .whenNotMatchedInsertAll() \
+     .execute()
+else:
+    output_df.write.format("delta").option("path", gold_path).save()
+
+print("Cross-asset signal merged successfully.")
