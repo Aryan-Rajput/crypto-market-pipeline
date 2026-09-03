@@ -9,7 +9,7 @@ spark.sparkContext.setLogLevel("ERROR")
 #CHANGED: read only the last 10 minutes, not the whole table
 df = spark.read \
     .format("delta") \
-    .load("s3a://crypto-pipeline-ar/silver-features/") \
+    .load("s3a://crypto-pipeline-ar-v3/silver-features/") \
     .filter(F.col("window_end") >= (F.current_timestamp() - F.expr("INTERVAL 10 MINUTES")))
 
 #UNCHANGED: your existing rolling window logic
@@ -34,7 +34,7 @@ output_df = vol_df.filter(
     F.col("window_end") >= (F.current_timestamp() - F.expr("INTERVAL 5 MINUTES"))
 )
 #NEW: write to Delta Lake with MERGE INTO
-gold_path = "s3a://crypto-pipeline-ar/gold/volatility-features/"
+gold_path = "s3a://crypto-pipeline-ar-v3/gold/volatility-features/"
 
 if DeltaTable.isDeltaTable(spark, gold_path):
     gold_table = DeltaTable.forPath(spark, gold_path)

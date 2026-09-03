@@ -72,8 +72,8 @@ flat_df = flattened_df.withColumn(
 
 flat_df.writeStream \
     .format("delta") \
-    .option("path", "s3a://crypto-pipeline-ar/bronze-ticks/") \
-    .option("checkpointLocation", "s3a://crypto-pipeline-ar/bronze-ticks/_checkpoints/") \
+    .option("path", "s3a://crypto-pipeline-ar-v3/bronze-ticks/") \
+    .option("checkpointLocation", "s3a://crypto-pipeline-ar-v3/bronze-ticks/_checkpoints/") \
     .partitionBy("event_date") \
     .outputMode("append") \
     .start() \

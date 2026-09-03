@@ -1,4 +1,5 @@
 .env
 venv
-crypto-pipeline-key.pem
+cpk.pem
 docs
+folder_structure.txt

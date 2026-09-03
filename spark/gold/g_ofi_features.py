@@ -17,7 +17,7 @@ spark.sparkContext.setLogLevel("ERROR")
 
 bronze_df = spark.readStream \
     .format("delta") \
-    .load("s3a://crypto-pipeline-ar/bronze-ticks/") \
+    .load("s3a://crypto-pipeline-ar-v3/bronze-ticks/") \
     .withColumn("trade_time", F.from_unixtime(F.col("trade_time") / 1000).cast("timestamp"))
 
 ofi_df = bronze_df \
@@ -44,8 +44,8 @@ ofi_df = bronze_df \
 ofi_querry = ofi_df.writeStream \
     .format("delta") \
     .outputMode("append") \
-    .option("checkpointLocation", "s3a://crypto-pipeline-ar/gold/ofi-features/_checkpoints/") \
-    .option("path", "s3a://crypto-pipeline-ar/gold/ofi-features/") \
+    .option("checkpointLocation", "s3a://crypto-pipeline-ar-v3/gold/ofi-features/_checkpoints/") \
+    .option("path", "s3a://crypto-pipeline-ar-v3/gold/ofi-features/") \
     .start()
 
 ofi_querry.awaitTermination()

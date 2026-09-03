@@ -1,6 +1,6 @@
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
-from detla.tables import DeltaTable
+from delta.tables import DeltaTable
 import os
 
 from spark.utils.spark_session import get_spark_session
@@ -12,7 +12,7 @@ spark.sparkContext.setLogLevel("ERROR")
 
 df = spark.read \
     .format("delta") \
-    .load("s3a://crypto-pipeline-ar/gold/ofi-features/") \
+    .load("s3a://crypto-pipeline-ar-v3/gold/ofi-features/") \
     .filter(F.col("window_end") >= (F.current_timestamp() - F.expr("INTERVAL 5 MINUTES")))
 
 btc_df = df.filter(F.col("symbol") == "BTCUSDT") \
@@ -37,7 +37,7 @@ output_df = btc_df.join(eth_df, on="window_start", how="inner") \
     )
 
 
-gold_path = "s3a://crypto-pipeline-ar/gold/cross-asset-signal/"
+gold_path = "s3a://crypto-pipeline-ar-v3/gold/cross-asset-signal/"
 
 if DeltaTable.isDeltaTable(spark, gold_path):
     gold_table = DeltaTable.forPath(spark, gold_path)

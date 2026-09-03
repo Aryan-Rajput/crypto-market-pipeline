@@ -17,7 +17,7 @@ spark = get_spark_session("SilverLayer")
 
 silver_df = spark.readStream \
     .format("delta") \
-    .load("s3a://crypto-pipeline-ar/bronze-ticks/") \
+    .load("s3a://crypto-pipeline-ar-v3/bronze-ticks/") \
     .withColumn("event_time", F.from_unixtime(F.col("event_time") / 1000).cast("timestamp")) \
     .withColumn("trade_time", F.from_unixtime(F.col("trade_time") / 1000).cast("timestamp")) \
     .withColumn("price", F.col("price").cast("double")) \
@@ -54,8 +54,8 @@ vwap_df = silver_df \
 silver_query = vwap_df.writeStream \
     .format("delta") \
     .outputMode("append") \
-    .option("checkpointLocation", "s3a://crypto-pipeline-ar/silver-features/_checkpoints/") \
-    .option("path", "s3a://crypto-pipeline-ar/silver-features/") \
+    .option("checkpointLocation", "s3a://crypto-pipeline-ar-v3/silver-features/_checkpoints/") \
+    .option("path", "s3a://crypto-pipeline-ar-v3/silver-features/") \
     .start()
 
 silver_query.awaitTermination()
