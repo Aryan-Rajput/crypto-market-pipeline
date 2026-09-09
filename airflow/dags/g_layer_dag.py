@@ -30,4 +30,20 @@ with DAG(
         ),
         execution_timeout=timedelta(minutes=5),
     )
+
+    run_cross_asset = BashOperator(
+        task_id="g_cross_asset",
+        bash_command=(
+            "cd ~/crypto-pipeline && PYTHONPATH=~/crypto-pipeline spark-submit "
+            "--master local[1] "
+            "--conf spark.driver.cores=1 "
+            "--conf spark.sql.shuffle.partitions=2 "
+            "--packages org.apache.spark:spark-sql-kafka-0-10_2.13:4.1.0,"
+            "io.delta:delta-spark_4.1_2.13:4.3.0,"
+            "org.apache.hadoop:hadoop-aws:3.4.1 "
+            "spark/gold/g_cross_asset.py"
+        ),
+        execution_timeout=timedelta(minutes=5),
+    )
     
+    run_volatility >> run_cross_asset
