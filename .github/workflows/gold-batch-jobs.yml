@@ -35,3 +35,10 @@ jobs:
             --conf spark.driver.memory=1500m \
             --packages io.delta:delta-spark_4.1_2.13:4.3.0,org.apache.hadoop:hadoop-aws:3.4.1 \
             spark/gold/g_volatility.py
+
+      - name: Run g_cross_asset
+        run: |
+          spark-submit --master local[1] \
+            --conf spark.driver.memory=1500m \
+            --packages io.delta:delta-spark_4.1_2.13:4.3.0,org.apache.hadoop:hadoop-aws:3.4.1 \
+            spark/gold/g_cross_asset.py
