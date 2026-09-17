@@ -1,7 +1,7 @@
 from pyspark.sql import functions as F
 from pyspark.sql import Window
 from delta.tables import DeltaTable
-from utils.spark_session import get_spark_session
+from spark.utils.spark_session import get_spark_session
 
 spark = get_spark_session("GoldVolatilityFeatures")
 spark.sparkContext.setLogLevel("ERROR")
