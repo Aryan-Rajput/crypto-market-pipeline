@@ -1,7 +1,5 @@
-from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
 from delta.tables import DeltaTable
-import os
 
 from spark.utils.spark_session import get_spark_session
 
@@ -9,11 +7,23 @@ spark = get_spark_session("GoldCrossAsset")
 
 spark.sparkContext.setLogLevel("ERROR")
 
+gold_path = "s3a://crypto-pipeline-ar-v3/gold/cross-asset-signal/"
+
+# reading the new data according to the last window in the gold table 
+# if the gold table does not exist we will read all the data from the source
+# and then merge it with the gold table
+try:
+    signal_table = DeltaTable.forPath(spark, gold_path)
+    last_window = signal_table.toDF().agg(F.max("window_start")).collect()[0][0]
+except:
+    last_window = None
 
 df = spark.read \
     .format("delta") \
-    .load("s3a://crypto-pipeline-ar-v3/gold/ofi-features/") \
-    .filter(F.col("window_end") >= (F.current_timestamp() - F.expr("INTERVAL 5 MINUTES")))
+    .load("s3a://crypto-pipeline-ar-v3/gold/ofi-features/")
+
+if last_window:
+    df = df.filter(F.col("window_start") > last_window)
 
 btc_df = df.filter(F.col("symbol") == "BTCUSDT") \
     .select(
@@ -36,17 +46,14 @@ output_df = btc_df.join(eth_df, on="window_start", how="inner") \
         (F.col("btc_ofi_norm") - F.col("eth_ofi_norm")).alias("divergence")
     )
 
-
-gold_path = "s3a://crypto-pipeline-ar-v3/gold/cross-asset-signal/"
-
 if DeltaTable.isDeltaTable(spark, gold_path):
     gold_table = DeltaTable.forPath(spark, gold_path)
     gold_table.alias("target").merge(
         output_df.alias("source"),
         "target.window_start = source.window_start"
     ).whenMatchedUpdateAll() \
-     .whenNotMatchedInsertAll() \
-     .execute()
+    .whenNotMatchedInsertAll() \
+    .execute()
 else:
     output_df.write.format("delta").option("path", gold_path).save()
 
