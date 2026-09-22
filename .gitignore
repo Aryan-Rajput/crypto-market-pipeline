@@ -3,3 +3,4 @@ venv
 cpk.pem
 docs
 folder_structure.txt
+tests
