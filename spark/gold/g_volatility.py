@@ -106,7 +106,7 @@ if has_existing_data:
     ).drop("last_window")
 
 
- # same as before, we only want to write new rows that are beyond the last processed timestamp for each symbol
+# same as before, we only want to write new rows that are beyond the last processed timestamp for each symbol
 if has_existing_data and DeltaTable.isDeltaTable(spark, vol_path):
     vol_table = DeltaTable.forPath(spark, vol_path)
     vol_table.alias("target").merge(

@@ -46,6 +46,7 @@ ofi_querry = ofi_df.writeStream \
     .outputMode("append") \
     .option("checkpointLocation", "s3a://crypto-pipeline-ar-v3/gold/ofi-features/_checkpoints/") \
     .option("path", "s3a://crypto-pipeline-ar-v3/gold/ofi-features/") \
+    .trigger(processingTime='30 seconds') \
     .start()
 
 ofi_querry.awaitTermination()

@@ -76,5 +76,6 @@ flat_df.writeStream \
     .option("checkpointLocation", "s3a://crypto-pipeline-ar-v3/bronze-ticks/_checkpoints/") \
     .partitionBy("event_date") \
     .outputMode("append") \
+    .trigger(processingTime='30 seconds') \
     .start() \
     .awaitTermination()
