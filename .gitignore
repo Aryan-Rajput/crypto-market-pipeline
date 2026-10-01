@@ -2,10 +2,9 @@
 venv
 cpk.pem
 docs
-folder_structure.txt
 tests
-output_silver.txt
-output.txt
-output_vol.txt
-output_merged.txt
-bronze_btc_0929_1001.parquet
+*.txt
+*.parquet
+*.csv
+*.zip
+bulk_data
