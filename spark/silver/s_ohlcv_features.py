@@ -10,7 +10,7 @@ BRONZE_PATH = "s3a://crypto-pipeline-ar-v3/bronze-ticks/"
 # Same path as before rm-ed the old chekpoints from dir 
 CHECKPOINT = "s3a://crypto-pipeline-ar-v3/silver-features/_checkpoints/"
 
-# True  = backfill: read bronze in chunks, then STOP when caught up.
+# True  = backfill: read bronze in chunks, then stop when caught up.
 #         Safe to stop and re-run; the checkpoint remembers progress.
 BACKFILL = True
 
@@ -62,7 +62,7 @@ vwap_df = (
 
 
 def upsert_to_silver(micro_batch_df, batch_id):
-    # Idempotent write: update existing (symbol, window_start) rows, insert new ones.
+    # Idempotent write: update existing (symbol, window_start) rows insert new ones.
     # Spark requires exactly these two arguments even though batch_id is unused.
     if micro_batch_df.isEmpty():
         return
@@ -78,7 +78,7 @@ def upsert_to_silver(micro_batch_df, batch_id):
             .execute()
         )
     else:
-        # first-ever write: nothing to merge against yet
+        # first ever write: nothing to merge against yet
         micro_batch_df.write.format("delta").mode("overwrite").save(SILVER_PATH)
 
 
