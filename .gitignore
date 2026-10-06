@@ -8,3 +8,9 @@ tests
 *.csv
 *.zip
 bulk_data
+!folder_structure.txt
+!requirements.txt
+__pycache__/
+.ipynb_checkpoints/
+*.log
+folder_structure.txt
