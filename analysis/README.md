@@ -19,6 +19,7 @@
 
 - OFI gives no usable signal for next-minute direction (lag-1 correlation ~0.01)
 - Next-minute volatility is predictable from its own history: R2 0.482 (15-minute average) and 0.511 (mix of windows)
-- Volume, trades, hour of day and |OFI| add nothing, with linear models or XGBoost
-- R2 is not comparable across time periods (the test period is more spread out)
-- 
+- Volatility history alone gives test R2 of about 0.41 (walk-forward, 4 years of BTCUSDT).
+- Volume, trade count and hour of day add a small, consistent gain (+0.002 R2, better in 5 of 5 folds).
+- |OFI| adds about +0.0001 R2, which is negligible, even with 2M rows and walk-forward validation.
+- Results on a 3-month sample were misleading (extra features looked harmful), so the longer history mattered.

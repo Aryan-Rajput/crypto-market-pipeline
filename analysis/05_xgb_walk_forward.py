@@ -1,9 +1,9 @@
-# Walk-forward validation: the data is cut into blocks in time order, and each
-# fold trains on all earlier blocks and tests on the next one.
+"""Walk-forward validation (feature sets A, L = A + day/week windows, C, B): the data is cut into blocks in time order, and each
+fold trains on all earlier blocks and tests on the next one.
 
-# Compare A / C / B within a fold (same rows). Don't compare R2 across folds.
-# Result: add the printed summary here after running.
-
+Compare A / C / B within a fold (same rows). Don't compare R2 across folds.
+Result: add the printed summary here after running.
+"""
 import numpy as np
 from xgboost import XGBRegressor
 
@@ -29,6 +29,8 @@ for i in range(1, N_CHUNKS):
 
 print()
 print("average test R2:", {n: round(float(np.mean(v)), 5) for n, v in results.items()})
+diff_LA = np.array(results["L"]) - np.array(results["A"])
+print("L minus A per fold:", np.round(diff_LA, 5), "| folds where L > A:", int((diff_LA > 0).sum()), "of", len(diff_LA))
 diff_BC = np.array(results["B"]) - np.array(results["C"])
 diff_CA = np.array(results["C"]) - np.array(results["A"])
 print("B minus C per fold:", np.round(diff_BC, 5), "| folds where B > C:", int((diff_BC > 0).sum()), "of", len(diff_BC))

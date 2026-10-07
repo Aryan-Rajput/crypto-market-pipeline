@@ -13,8 +13,11 @@ KLINE_COLS = ["open_time", "open", "high", "low", "close", "volume", "close_time
 A_FEATURES = ["lv_avg1", "lv_avg5", "lv_avg15", "lv_avg60"]
 B_FEATURES = A_FEATURES + ["lvolume", "ltrades", "abs_ofi5", "hsin", "hcos"]
 C_FEATURES = [c for c in B_FEATURES if c != "abs_ofi5"]
-FEATURE_SETS = {"A": A_FEATURES, "C": C_FEATURES, "B": B_FEATURES}
+LONG_WINDOWS = (1440, 10080)                      # added for longer-term volatility persistence --> 1 day and 1 week
+L_FEATURES = A_FEATURES + [f"lv_avg{w}" for w in LONG_WINDOWS]
+FEATURE_SETS = {"A": A_FEATURES, "L": L_FEATURES, "C": C_FEATURES, "B": B_FEATURES}
 FEATURE_LABELS = {"A": "vol history only",
+                  "L": "A + day and week windows",
                   "C": "+ volume, trades, hour (no OFI)",
                   "B": "C + |OFI|"}
 
@@ -47,7 +50,7 @@ def add_volatility_features(k):
     k["lv"] = np.log(k["vol"].replace(0, np.nan))
     k["target"] = k["lv"].shift(-1)                       # next minute's log-range
 
-    for w in (1, 5, 15, 60):
+    for w in (1, 5, 15, 60) + LONG_WINDOWS:
         k[f"lv_avg{w}"] = k["lv"].rolling(w).mean()
 
     k["lvolume"] = np.log(k["volume"].replace(0, np.nan)).rolling(5).mean()
@@ -62,7 +65,8 @@ def add_volatility_features(k):
 
 def get_model_frame(symbol="BTCUSDT"):
     k = add_volatility_features(load_klines(symbol))
-    return k.dropna(subset=B_FEATURES + ["target"]).reset_index(drop=True)
+    # drop on every feature list so all sets are scored on identical rows
+    return k.dropna(subset=B_FEATURES + L_FEATURES + ["target"]).reset_index(drop=True)
 
 
 def chrono_split(d, train_frac=0.7):
