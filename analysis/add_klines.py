@@ -1,8 +1,8 @@
-"""Download Binance monthly 1-minute klines into data/raw/klines/.
+# Download Binance monthly 1-minute klines into data/raw/klines/.
 
-Run from the repo root:  python analysis/download_klines.py
-Files that already exist are skipped, so it is safe to re-run.
-"""
+# Run from the repo root:  python analysis/download_klines.py
+# Files that already exist are skipped, so it is safe to re-run.
+
 import io
 import urllib.error
 import urllib.request

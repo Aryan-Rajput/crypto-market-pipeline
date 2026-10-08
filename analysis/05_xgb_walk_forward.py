@@ -1,9 +1,11 @@
-"""Walk-forward validation (feature sets A, L = A + day/week windows, C, B): the data is cut into blocks in time order, and each
-fold trains on all earlier blocks and tests on the next one.
+# Walk-forward validation (feature sets A, L = A + day/week windows, C, B): the data is cut into blocks in time order, and each
+# fold trains on all earlier blocks and tests on the next one.
 
-Compare A / C / B within a fold (same rows). Don't compare R2 across folds.
-Result: add the printed summary here after running.
-"""
+# Result (average test R2): A 0.40896, L 0.40734, C 0.41095, B 0.41107.
+# C - A: positive in 5 of 5 folds (+0.0001 to +0.0039): volume, trades, hour help a little.
+# B - C: positive in 4 of 5 folds but only -0.0003 to +0.0003: |OFI| adds nothing.
+# L - A: -0.0095 in fold 1, +0.0001 to +0.0006 in the rest: day/week windows add nothing.
+
 import numpy as np
 from xgboost import XGBRegressor
 

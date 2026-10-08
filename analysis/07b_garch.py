@@ -1,3 +1,9 @@
+# Result (test R2): 0.294 fitting on all training rows (alpha 0.119, beta 0.875,
+# persistence 0.994); 0.311 fitting on the last 500k rows (alpha 0.069, beta 0.931,
+# persistence 1.0). Both are below the 15-min average baseline (0.379) and
+# XGBoost (0.426). GARCH sees only close-to-close returns, not the high-low range.
+
+
 import numpy as np
 from arch import arch_model
 from sklearn.linear_model import LinearRegression

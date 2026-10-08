@@ -1,3 +1,8 @@
+
+# Result (average test R2): BTC only 0.41095, BTC + ETH 0.41067. ETH gain per fold:
+# -0.0005, -0.0001, -0.0007, +0.00004, -0.0001; ETH helped in 1 of 5 folds. No gain.
+#
+
 import numpy as np
 from xgboost import XGBRegressor
 

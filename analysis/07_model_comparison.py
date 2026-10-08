@@ -1,11 +1,15 @@
-"""Model comparison on one fixed feature set (C) and one fixed train/test split.
+# Model comparison on one fixed feature set (C) and one fixed train/test split.
 
-Tuned models pick their depth and number of trees on a validation slice taken
-from the END of the training data (early stopping), so the test set is only
-used once, for the final score.
+# Tuned models pick their depth and number of trees on a validation slice taken
+# from the END of the training data (early stopping), so the test set is only
+# used once, for the final score.
 
-Result: add the printed table here after running.
-"""
+# Result (test R2): LightGBM tuned 0.42651 (6.5s) | XGBoost tuned 0.42636 (11s) |
+# XGBoost default 0.42597 (14s) | Decision tree 0.41792 | Ridge 0.41434 |
+# 15-min average baseline 0.37901.
+# Boosted models tie (gap < 0.001); depths 3/5/7 differ by < 0.0003 on validation.
+
+
 import time
 
 import lightgbm as lgb
