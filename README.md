@@ -26,6 +26,9 @@ I wanted to work with Kafka/Redpanda
 
 ## Stack (actual, not original plan)
 
+![Project_architecture](/assets/Arch_cr.drawio.svg)
+
+
 ```
 Binance public WebSocket (BTC/USDT, ETH/USDT trade stream)
   -> Redpanda Cloud Serverless (Kafka-API compatible)
