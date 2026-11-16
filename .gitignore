@@ -1,5 +1,6 @@
 .env
 venv
+.venv
 cpk.pem
 docs
 tests

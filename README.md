@@ -24,7 +24,7 @@ I wanted to work with Kafka/Redpanda
 | Redis / TimescaleDB serving layer | Not started |
 | FastAPI + React frontend | Not started, replaced by the Streamlit plan |
 
-## Stack (actual, not original plan)
+## Stack and Architecture
 
 ![Project_architecture](/assets/Arch_cr.drawio.svg)
 
